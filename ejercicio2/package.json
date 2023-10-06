@@ -1,0 +1,77 @@
+{
+  "name": "ejercicio-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+
+// models.js
+const mongoose = require('mongoose');
+
+// Define el esquema del artículo
+const articuloSchema = new mongoose.Schema({
+  nombre: String,
+  precio: Number,
+  existencias: Number,
+});
+
+// Define el esquema del ticket
+const ticketSchema = new mongoose.Schema({
+  subtotal: Number,
+  iva: Number,
+  total: Number,
+  articulos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Articulo' }],
+  usuario: String,
+});
+
+// Crea modelos a partir de los esquemas
+const Articulo = mongoose.model('Articulo', articuloSchema);
+const Ticket = mongoose.model('Ticket', ticketSchema);
+
+module.exports = {
+  Articulo,
+  Ticket,
+};
+const mongoose = require('mongoose');
+const { Articulo, Ticket } = require('./models');
+mongoose.connect('mongodb:mongodb://localhost:27017', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Crear un nuevo artículo
+const nuevoArticulo = new Articulo({
+  nombre: 'Producto 1',
+  precio: 10.99,
+  existencias: 100,
+});
+
+// Guardar el artículo en la base de datos
+nuevoArticulo.save((err, articuloGuardado) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('Artículo guardado:', articuloGuardado);
+  }
+});
+
+// Crear un nuevo ticket
+const nuevoTicket = new Ticket({
+  subtotal: 100,
+  iva: 16,
+  total: 116,
+  articulos: [nuevoArticulo._id], // Asigna el ID del artículo creado al ticket
+  usuario: 'Usuario1',
+});
+
+// Guardar el ticket en la base de datos
+nuevoTicket.save((err, ticketGuardado) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('Ticket guardado:', ticketGuardado);
+  }
+});
+}
